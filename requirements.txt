@@ -1,0 +1,2 @@
+python-bitcoin>=0.0.6
+sqlalchemy>=0.8.2
