@@ -5,12 +5,18 @@ from sqlalchemy import *
 from sqlalchemy import orm
 from . import Base
 
+from .fields.binary import BitField
 from .fields.hash_ import Hash256
 from .mixins.hashable import HybridHashableMixin
 
 from bitcoin import patricia as core
+from bitcoin.tools import Bits
 
 class PatriciaNode(HybridHashableMixin, core.PatriciaNode, Base):
+    __slots__ = ('value prune_value '
+                 'left_prefix left_node left_hash '
+                 'right_prefix right_node right_hash '
+                 '_hash size length').split()
     __tablename__ = 'bitcoin_patricia_node'
     __table_args__ = (
         Index('__'.join(['ix',__tablename__,'hash']),
@@ -29,14 +35,49 @@ class PatriciaNode(HybridHashableMixin, core.PatriciaNode, Base):
     }
 
     value = Column(LargeBinary)
+    prune_value = Column(Boolean)
 
-    extra = Column(LargeBinary)
+    left_prefix  = Column(BitField(implicit=Bits('0b0')))
+    left_node_id = Column(Integer, ForeignKey('bitcoin_patricia_node.id'))
+    left_node    = orm.relationship(lambda: PatriciaNode,
+        primaryjoin = 'PatriciaNode.id == PatriciaNode.left_node_id',
+        uselist     = False)
+    left_hash    = Column(Hash256(length=32))
 
-    children = orm.relationship(lambda: PatriciaLink,
-        secondary     = lambda: PatriciaNodeLink.__table__,
-        primaryjoin   = lambda: PatriciaNode.id == PatriciaNodeLink.parent_id,
-        secondaryjoin = lambda: PatriciaLink.id == PatriciaNodeLink.link_id,
-        order_by      = lambda: PatriciaLink.prefix)
+    right_prefix  = Column(BitField(implicit=Bits('0b1')))
+    right_node_id = Column(Integer, ForeignKey('bitcoin_patricia_node.id'))
+    right_node    = orm.relationship(lambda: PatriciaNode,
+        primaryjoin = 'PatriciaNode.id == PatriciaNode.right_node_id',
+        uselist     = False)
+    right_hash    = Column(Hash256(length=32))
+
+    @property
+    def children(self):
+        link_class = getattr(self, 'get_link_class',
+            lambda: getattr(self, 'link_class', core.PatriciaLink))()
+        class _Children(list):
+            def append(children, link):
+                if not link.prefix[0]:
+                    self.left_prefix, self.left_node, self.left_hash = (
+                        link.prefix, link.node, link._hash)
+                else:
+                    self.right_prefix, self.right_node, self.right_hash = (
+                        link.prefix, link.node, link._hash)
+            def extend(children, links):
+                for link in links:
+                    children.append(link)
+        children = ()
+        if self.left_prefix is not None:
+            children += (link_class(
+                prefix = self.left_prefix,
+                node   = self.left_node,
+                hash   = self.left_hash),)
+        if self.right_prefix is not None:
+            children += (link_class(
+                prefix = self.right_prefix,
+                node   = self.right_node,
+                hash   = self.right_hash),)
+        return _Children(children)
     def children_create(self):
         pass
 

@@ -52,7 +52,7 @@ setup(name='sqlalchemy-bitcoin',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
     install_requires=[
-        'python-bitcoin>=0.0.6',
+        'python-bitcoin>=0.0.7',
         'sqlalchemy>=0.8.2',
     ],
 )
