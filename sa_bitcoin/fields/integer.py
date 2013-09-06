@@ -15,8 +15,10 @@ class LittleEndian(TypeDecorator):
         super(LittleEndian, self).__init__(length, *args, **kwargs)
 
     def process_bind_param(self, value, dialect):
+        if value is None: return None
         return serialize_leint(value, self.impl.length)
     def process_result_value(self, value, dialect):
+        if value is None: return None
         return deserialize_leint(StringIO(value), len(value))
     def copy(self):
         return self.__class__(self.impl.length)
@@ -28,8 +30,10 @@ class BigEndian(TypeDecorator):
         super(BigEndian, self).__init__(length, *args, **kwargs)
 
     def process_bind_param(self, value, dialect):
+        if value is None: return None
         return serialize_beint(value, self.impl.length)
     def process_result_value(self, value, dialect):
+        if value is None: return None
         return deserialize_beint(StringIO(value), len(value))
     def copy(self):
         return self.__class__(self.impl.length)
@@ -38,22 +42,28 @@ class UnsignedSmallInteger(TypeDecorator):
     impl = SmallInteger
 
     def process_bind_param(self, value, dialect):
+        if value is None: return None
         return (value >= 2**15) and value - 2**16 or value
     def process_result_value(self, value, dialect):
+        if value is None: return None
         return (value < 0) and value + 2**16 or value
 
 class UnsignedInteger(TypeDecorator):
     impl = Integer
 
     def process_bind_param(self, value, dialect):
+        if value is None: return None
         return (value >= 2**31) and value - 2**32 or value
     def process_result_value(self, value, dialect):
+        if value is None: return None
         return (value < 0) and value + 2**32 or value
 
 class UnsignedBigInteger(TypeDecorator):
     impl = BigInteger
 
     def process_bind_param(self, value, dialect):
+        if value is None: return None
         return (value >= 2**63) and value - 2**64 or value
     def process_result_value(self, value, dialect):
+        if value is None: return None
         return (value < 0) and value + 2**64 or value
