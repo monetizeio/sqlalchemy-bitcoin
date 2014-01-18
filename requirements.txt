@@ -1,2 +1,2 @@
+SQLAlchemy>=0.8.2
 python-bitcoin>=0.0.7
-sqlalchemy>=0.8.2
