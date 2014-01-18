@@ -239,12 +239,8 @@ ${CACHE}/mpfr-3.1.2-pkg.tar.gz: ${CACHE}/mpfr/mpfr-3.1.2.tar.xz ${CACHE}/gmp-5.1
 
 .PHONY: mpfr-pkg
 mpfr-pkg: ${SYSROOT}/.stamp-mpfr-h
-
 ${SYSROOT}/.stamp-mpfr-h: ${CACHE}/mpfr-3.1.2-pkg.tar.gz ${SYSROOT}/.stamp-gmp-h
-	# Uncompress the package snapshots
 	tar -C "${SYSROOT}" --gzip -xf "$<"
-
-	# All done!
 	touch "$@"
 
 # ===--------------------------------------------------------------------===
@@ -282,10 +278,6 @@ ${CACHE}/mpc-1.0.1-pkg.tar.gz: ${CACHE}/mpc/mpc-1.0.1.tar.gz ${CACHE}/gmp-5.1.3-
 
 .PHONY: mpc-pkg
 mpc-pkg: ${SYSROOT}/.stamp-mpc-h
-
 ${SYSROOT}/.stamp-mpc-h: ${CACHE}/mpc-1.0.1-pkg.tar.gz ${SYSROOT}/.stamp-gmp-h ${SYSROOT}/.stamp-mpfr-h
-	# Uncompress the package snapshots
 	tar -C "${SYSROOT}" --gzip -xf "$<"
-
-	# All done!
 	touch "$@"
