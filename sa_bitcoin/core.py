@@ -154,7 +154,7 @@ class Block(HybridHashableMixin, core.Block, Base):
 
     # Called ‘parent’ because this is technically a branching/tree relationship,
     # this field is called called the ‘previous block’ in the bitcoin protocol as
-    # it represent the last block in the nominally linear chain.
+    # it represents the last block in the nominally linear chain.
     parent_hash = Column(Hash256, nullable=False)
 
     # The hash of the root node of the Block/Transaction merkle list recording
@@ -279,7 +279,7 @@ class Transaction(HybridHashableMixin, core.Transaction, Base):
         Index('__'.join(['ix', __tablename__, 'hash']),
             'hash', unique = True),)
 
-    # The inputs and outputs are joined from a separate models using the
+    # The inputs and outputs are joined from separate models using the
     # ordering_list collection class, which maintains the offset index.
     # The create_inputs() and create_outputs() methods are necessary to
     # override python-bitcoin's default behavior which itself would
