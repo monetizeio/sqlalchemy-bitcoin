@@ -279,7 +279,7 @@ class Transaction(HybridHashableMixin, core.Transaction, Base):
         Index('__'.join(['ix', __tablename__, 'hash']),
             'hash', unique = True),)
 
-    # The inputs and outputs are joined from a separate models using the
+    # The inputs and outputs are joined from separate models using the
     # ordering_list collection class, which maintains the offset index.
     # The create_inputs() and create_outputs() methods are necessary to
     # override python-bitcoin's default behavior which itself would
